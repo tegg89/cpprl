@@ -16,7 +16,7 @@ struct NNModel : torch::nn::Module{
             output(torch::nn::Linear(8, num_actions)){}
 
     torch::Tensor forward(torch::Tensor input) {
-        input = torch::relu(feat1(input));
+        input = torch::relu(linear1(input));
         // Flatten the output
         input = input.view({input.size(0), -1});
         // input = torch::relu(linear2(input));

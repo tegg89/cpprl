@@ -3,6 +3,6 @@ project(example)
 
 find_package(Torch REQUIRED)
 
-add_executable(example example.cpp)
+add_executable(example example.cpp model.cpp model.h runner.cpp runner.h)
 target_link_libraries(example "${TORCH_LIBRARIES}")
 set_property(TARGET example PROPERTY CXX_STANDARD 14)
