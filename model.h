@@ -1,7 +1,3 @@
-//
-// Created by Navneet Madhu Kumar on 2019-07-10.
-//
-
 #pragma once
 
 #include "model.h"
@@ -10,25 +6,28 @@
 
 struct NNModel : torch::nn::Module{
     NNModel(int64_t input_channels, int64_t num_actions)
-            :
-            linear1(torch::nn::Linear(input_channels, 8)),  // hidden feat = 8
-            // linear2(torch::nn::Linear(32, 32)),
-            output(torch::nn::Linear(8, num_actions)){}
+            : fc_1(register_module("fc_1", torch::nn::Linear(input_channels, 256))),  // hidden feat = 8
+              fc_2(register_module("fc_2", torch::nn::Linear(256, 256))),
+              value(register_module("value", torch::nn::Linear(256, 2))),
+              output(register_module("output", torch::nn::Linear(256, num_actions))){}
 
-    torch::Tensor forward(torch::Tensor input) {
-        input = torch::relu(linear1(input));
-        // Flatten the output
-        input = input.view({input.size(0), -1});
-        // input = torch::relu(linear2(input));
-        input = output(input);
-        return input;
+    std::tuple<torch::Tensor, torch::Tensor> forward(torch::Tensor input) {
+        torch::Tensor v, act;
+
+        input = torch::relu(fc_1(input));
+        input = torch::relu(fc_2(input));
+        v = value(input);
+        act = output(input);
+        
+        return {v, act};
     }
 
-    torch::Tensor act(torch::Tensor state){
-        torch::Tensor q_value = forward(state);
-        torch::Tensor action = std::get<1>(q_value.max(1));
+    torch::Tensor act(torch::Tensor state) {
+        auto [q_value, actions] = forward(state);
+        torch::Tensor action = std::get<1>(actions.max(1));
+
         return action;
     }
 
-    torch::nn::Linear linear1, output;
+    torch::nn::Linear fc_1, fc_2, value, output;
 };
