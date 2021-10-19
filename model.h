@@ -10,10 +10,10 @@
 
 struct NNModel : torch::nn::Module {
     NNModel(int64_t input_channels, int64_t num_actions)
-            : fc_1(torch::nn::Linear(input_channels, 256)),
-              fc_2(torch::nn::Linear(256, 256)),
-              value(torch::nn::Linear(256, 2)),
-              output(torch::nn::Linear(256, num_actions)){}
+            : fc_1(register_module("fc_1", torch::nn::Linear(4, 256))),
+              fc_2(register_module("fc_2", torch::nn::Linear(256, 256))),
+              value(register_module("value", torch::nn::Linear(256, 2))),
+              output(register_module("output", torch::nn::Linear(256, num_actions))){}
 
     std::tuple<torch::Tensor, torch::Tensor> forward(torch::Tensor input) {
         torch::Tensor v, act;
