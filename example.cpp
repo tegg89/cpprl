@@ -4,6 +4,6 @@
 
 int main() {
     Runner runner(8, 1);
-    runner.loadstatedict("./all_weights.pt");
+    runner.loadstatedict("./all_shared_weights.pt");
     runner.run();
 }
